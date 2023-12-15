@@ -1,11 +1,5 @@
-resource "terraform_data" "validator" {
-  // https://github.com/hashicorp/terraform/issues/31122
-  lifecycle {
-    precondition {
-        condition = !(var.redirect_http_to_https == true && var.ssl_certificate_enabled == false)
-        error_message = "redirect_http_to_https can only be enabled when ssl_certificate_id is set to a valid value"
-    }
-  }
+locals {
+  redirect_http_to_https = var.redirect_http_to_https == true && var.ssl_certificate_enabled == true
 }
 
 resource "google_compute_backend_service" "lb_backend" {
@@ -32,7 +26,7 @@ resource "google_compute_url_map" "lb_url_map" {
 resource "google_compute_target_http_proxy" "lb_target_http_proxy" {
   name = "${var.name}-http-proxy"
 
-  url_map = var.redirect_http_to_https ? google_compute_url_map.http_to_https_redirect[0].self_link : google_compute_url_map.lb_url_map.self_link
+  url_map = local.redirect_http_to_https ? google_compute_url_map.http_to_https_redirect[0].self_link : google_compute_url_map.lb_url_map.self_link
 }
 
 resource "google_compute_ssl_policy" "lb_target_https_ssl_policy" {
@@ -59,7 +53,7 @@ resource "google_compute_global_address" "ip" {
 }
 
 resource "google_compute_url_map" "http_to_https_redirect" {
-  count = var.redirect_http_to_https ? 1 : 0
+  count = local.redirect_http_to_https ? 1 : 0
   
   name = "http-redirect"
 
