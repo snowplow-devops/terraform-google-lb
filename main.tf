@@ -32,7 +32,7 @@ resource "google_compute_url_map" "lb_url_map" {
 resource "google_compute_target_http_proxy" "lb_target_http_proxy" {
   name = "${var.name}-http-proxy"
 
-  url_map = google_compute_url_map.lb_url_map.self_link
+  url_map = var.redirect_http_to_https ? google_compute_url_map.http_to_https_redirect[0].self_link : google_compute_url_map.lb_url_map.self_link
 }
 
 resource "google_compute_ssl_policy" "lb_target_https_ssl_policy" {
@@ -70,18 +70,10 @@ resource "google_compute_url_map" "http_to_https_redirect" {
   }
 }
 
-resource "google_compute_target_http_proxy" "http_to_https_redirect" {
-  count = var.redirect_http_to_https ? 1 : 0
-
-  name    = "http-redirect"
-  
-  url_map = google_compute_url_map.http_to_https_redirect[0].self_link
-}
-
 resource "google_compute_global_forwarding_rule" "lb_http_forwarding_rule" {
   name = "${var.name}-http-frontend"
 
-  target     = var.redirect_http_to_https ? google_compute_target_http_proxy.http_to_https_redirect[0].self_link : google_compute_target_http_proxy.lb_target_http_proxy.self_link
+  target     = google_compute_target_http_proxy.lb_target_http_proxy.self_link
   port_range = "80"
   ip_address = google_compute_global_address.ip.address
 }
