@@ -58,7 +58,7 @@ resource "google_compute_global_address" "ip" {
   name = var.name
 }
 
-resource "google_compute_url_map" "http-to-https-redirect" {
+resource "google_compute_url_map" "http_to_https_redirect" {
   count = var.redirect_http_to_https ? 1 : 0
   
   name = "http-redirect"
@@ -70,18 +70,18 @@ resource "google_compute_url_map" "http-to-https-redirect" {
   }
 }
 
-resource "google_compute_target_http_proxy" "http-to-https-redirect" {
+resource "google_compute_target_http_proxy" "http_to_https_redirect" {
   count = var.redirect_http_to_https ? 1 : 0
 
   name    = "http-redirect"
   
-  url_map = google_compute_url_map.http-to-https-redirect[0].self_link
+  url_map = google_compute_url_map.http_to_https_redirect[0].self_link
 }
 
 resource "google_compute_global_forwarding_rule" "lb_http_forwarding_rule" {
   name = "${var.name}-http-frontend"
 
-  target     = var.redirect_http_to_https ? google_compute_target_http_proxy.http-to-https-redirect[0].self_link : google_compute_target_http_proxy.lb_target_http_proxy.self_link
+  target     = var.redirect_http_to_https ? google_compute_target_http_proxy.http_to_https_redirect[0].self_link : google_compute_target_http_proxy.lb_target_http_proxy.self_link
   port_range = "80"
   ip_address = google_compute_global_address.ip.address
 }
@@ -95,3 +95,6 @@ resource "google_compute_global_forwarding_rule" "lb_https_forwarding_rule" {
   port_range = "443"
   ip_address = google_compute_global_address.ip.address
 }
+
+
+
