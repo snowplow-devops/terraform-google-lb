@@ -94,7 +94,7 @@ No modules.
 
 # Copyright and license
 
-The Terraform Google Load Balancer project is Copyright 2021-present Snowplow Analytics Ltd.
+The Terraform Google Load Balancer project is Copyright 2021-current Snowplow Analytics Ltd.
 
 Licensed under the [Snowplow Community License](https://docs.snowplow.io/community-license-1.0). _(If you are uncertain how it applies to your use case, check our answers to [frequently asked questions](https://docs.snowplow.io/docs/contributing/community-license-faq/).)_
 
